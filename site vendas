@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Óticas Diniz - Configurador de Lentes</title>
+    <!-- Importando a fonte Open Sans do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #c4161c; /* Vermelho das Óticas Diniz */
+            --secondary-color: #FFFFFF; /* Fundo branco para cards */
+            --hover-color: #a01217; /* Vermelho mais escuro para hover */
+            --back-color: #6C757D; /* Cinza para o botão de voltar */
+            --text-color: #333; /* Cor do texto (preto) */
+            --background-color: #c4161c; /* Cor de fundo da página */
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif; /* Fonte Open Sans */
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--secondary-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .option-card img {
+            width: 100%;
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-card h4 {
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+
+        .option-card p {
+            font-size: 0.9em;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .navigation-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .back-button {
+            background-color: var(--back-color) !important;
+        }
+
+        .back-button:hover {
+            background-color: #5A6268 !important;
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .summary {
+            background: var(--secondary-color);
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .premium-badge {
+            background: gold;
+            color: black;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Óticas Diniz</h1>
+            <h2>Configurador de Lentes</h2>
+        </div>
+
+        <!-- Passos da navegação -->
+        <div id="step1" class="step active">
+            <h3>Selecione o Tipo de Lente:</h3>
+            <div class="options-grid">
+                <div class="option-card" onclick="selectCategory('visao-simples')">
+                    <img src="https://via.placeholder.com/150?text=Visão+Simples" alt="Visão Simples">
+                    <h4>Visão Simples</h4>
+                    <p>Lentes para correção de problemas de visão de perto ou longe.</p>
+                </div>
+                <div class="option-card" onclick="selectCategory('multifocais')">
+                    <img src="https://via.placeholder.com/150?text=Multifocais" alt="Multifocais">
+                    <h4>Multifocais</h4>
+                    <p>Lentes que corrigem visão de perto, intermediária e longe.</p>
+                </div>
+                <div class="option-card" onclick="selectCategory('bifocais')">
+                    <img src="https://via.placeholder.com/150?text=Bifocais" alt="Bifocais">
+                    <h4>Bifocais</h4>
+                    <p>Lentes com duas áreas de visão: perto e longe.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="step2" class="step"></div>
+        <div id="step3" class="step"></div>
+        <div id="step4" class="step"></div>
+        <div id="step5" class="step"></div>
+        <div id="summary" class="step summary"></div>
+    </div>
+
+    <script>
+        // Objeto de opções
+        const options = {
+            'visao-simples': {
+                types: [
+                    { name: 'Convencional', img: 'https://via.placeholder.com/150?text=Convencional', desc: 'Lentes tradicionais com tecnologia básica.' },
+                    { name: 'Digital', img: 'https://via.placeholder.com/150?text=Digital', desc: 'Lentes com design digital para maior precisão.' },
+                    { name: 'Freeform', img: 'https://via.placeholder.com/150?text=Freeform', desc: 'Lentes personalizadas com tecnologia avançada.' }
+                ],
+                fotossensivel: ['Sim', 'Não'],
+                antirreflexo: ['Sem Antirreflexo', 'Verde', 'Azul', 'Solar']
+            },
+            'multifocais': {
+                types: [
+                    { name: 'Convencional', img: 'https://via.placeholder.com/150?text=Convencional', desc: 'Lentes multifocais tradicionais.' },
+                    { name: 'Digital', img: 'https://via.placeholder.com/150?text=Digital', desc: 'Multifocais com design digital.' },
+                    { name: 'Freeform', img: 'https://via.placeholder.com/150?text=Freeform', desc: 'Multifocais personalizadas com tecnologia avançada.' }
+                ],
+                versions: [
+                    { name: 'DMAX GO', img: 'https://via.placeholder.com/150?text=DMAX+GO', desc: 'Versão básica para uso diário.' },
+                    { name: 'DMAX LIGHT', img: 'https://via.placeholder.com/150?text=DMAX+LIGHT', desc: 'Leve e confortável para uso prolongado.' },
+                    { name: 'DMAX SMART', img: 'https://via.placeholder.com/150?text=DMAX+SMART', desc: 'Tecnologia inteligente para visão nítida.' },
+                    { name: 'DMAX TOP', img: 'https://via.placeholder.com/150?text=DMAX+TOP', desc: 'Alto desempenho para todas as situações.' },
+                    { name: 'DMAX INFINITY', img: 'https://via.placeholder.com/150?text=DMAX+INFINITY', desc: 'A mais avançada, com máxima personalização.' }
+                ],
+                fotossensivel: ['Sim', 'Não'],
+                antirreflexo: ['Sem Antirreflexo', 'Verde', 'Azul', 'Verde Premium', 'Azul Premium']
+            },
+            'bifocais': {
+                types: [
+                    { name: 'Convencional', img: 'https://via.placeholder.com/150?text=Convencional', desc: 'Lentes bifocais tradicionais.' },
+                    { name: 'Digital', img: 'https://via.placeholder.com/150?text=Digital', desc: 'Bifocais com design digital.' },
+                    { name: 'Freeform', img: 'https://via.placeholder.com/150?text=Freeform', desc: 'Bifocais personalizadas com tecnologia avançada.' }
+                ],
+                fotossensivel: ['Sim', 'Não'],
+                antirreflexo: ['Sem Antirreflexo', 'Verde', 'Azul', 'Solar']
+            }
+        };
+
+        // Estado atual
+        let currentSelection = {
+            category: '',
+            type: '',
+            versao: '',
+            fotossensivel: '',
+            antirreflexo: ''
+        };
+
+        // Histórico de navegação
+        let currentStepHistory = ['step1'];
+
+        // Função para navegar entre passos
+        function navigateTo(stepId, fromHistory = false) {
+            if (!fromHistory) currentStepHistory.push(stepId);
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        // Função para voltar
+        function goBack() {
+            if (currentStepHistory.length > 1) {
+                currentStepHistory.pop();
+                const prevStep = currentStepHistory[currentStepHistory.length - 1];
+                navigateTo(prevStep, true);
+            }
+        }
+
+        // Seleção de categoria
+        function selectCategory(category) {
+            currentSelection.category = category;
+            showTypeSelection();
+        }
+
+        // Mostrar seleção de tipo
+        function showTypeSelection() {
+            const step2 = document.getElementById('step2');
+            const categoryData = options[currentSelection.category];
+            step2.innerHTML = `
+                <h3>Selecione o Tipo de ${currentSelection.category.replace('-', ' ').toUpperCase()}:</h3>
+                <div class="options-grid">
+                    ${categoryData.types.map(type => `
+                        <div class="option-card" onclick="selectType('${type.name}')">
+                            <img src="${type.img}" alt="${type.name}">
+                            <h4>${type.name}</h4>
+                            <p>${type.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="navigation-buttons">
+                    <button class="back-button" onclick="goBack()">Voltar</button>
+                </div>
+            `;
+            navigateTo('step2');
+        }
+
+        // Seleção de tipo
+        function selectType(type) {
+            currentSelection.type = type;
+            if (currentSelection.category === 'multifocais' && type === 'Freeform') {
+                showVersionSelection();
+            } else {
+                showFotossensivelSelection();
+            }
+        }
+
+        // Mostrar seleção de versão (apenas para Multifocais Freeform)
+        function showVersionSelection() {
+            const step3 = document.getElementById('step3');
+            step3.innerHTML = `
+                <h3>Selecione a Versão Freeform:</h3>
+                <div class="options-grid">
+                    ${options.multifocais.versions.map(version => `
+                        <div class="option-card" onclick="selectVersion('${version.name}')">
+                            <img src="${version.img}" alt="${version.name}">
+                            <h4>${version.name}</h4>
+                            <p>${version.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="navigation-buttons">
+                    <button class="back-button" onclick="goBack()">Voltar</button>
+                </div>
+            `;
+            navigateTo('step3');
+        }
+
+        // Seleção de versão
+        function selectVersion(version) {
+            currentSelection.versao = version;
+            showFotossensivelSelection();
+        }
+
+        // Mostrar seleção de fotossensível
+        function showFotossensivelSelection() {
+            const stepId = currentSelection.versao ? 'step4' : 'step3';
+            const step = document.getElementById(stepId);
+            step.innerHTML = `
+                <h3>Tratamento Fotossensível:</h3>
+                <div class="options-grid">
+                    ${options[currentSelection.category].fotossensivel.map(opt => `
+                        <div class="option-card" onclick="selectFotossensivel('${opt}')">
+                            <img src="https://via.placeholder.com/150?text=${opt}" alt="${opt}">
+                            <h4>${opt}</h4>
+                            <p>${opt === 'Sim' ? 'Lentes que escurecem automaticamente ao sol, proporcionando conforto visual em ambientes externos e internos.' : 'Lentes sem alteração ao sol, mantendo a transparência em qualquer ambiente.'}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="navigation-buttons">
+                    <button class="back-button" onclick="goBack()">Voltar</button>
+                </div>
+            `;
+            navigateTo(stepId);
+        }
+
+        // Seleção de fotossensível
+        function selectFotossensivel(opt) {
+            currentSelection.fotossensivel = opt;
+            showAntirreflexoSelection();
+        }
+
+        // Mostrar seleção de antirreflexo
+        function showAntirreflexoSelection() {
+            const stepId = currentSelection.versao ? 'step5' : 'step4';
+            const step = document.getElementById(stepId);
+            const antirreflexoOptions = currentSelection.category === 'multifocais' && currentSelection.type === 'Freeform' ?
+                options.multifocais.antirreflexo : options[currentSelection.category].antirreflexo;
+
+            step.innerHTML = `
+                <h3>Tratamento Antirreflexo:</h3>
+                <div class="options-grid">
+                    ${antirreflexoOptions.map(opt => `
+                        <div class="option-card" onclick="selectAntirreflexo('${opt}')">
+                            <img src="https://via.placeholder.com/150?text=${opt}" alt="${opt}">
+                            <h4>${opt} ${opt.includes('Premium') ? '<span class="premium-badge">2 anos de garantia</span>' : ''}</h4>
+                            <p>${opt === 'Sem Antirreflexo' ? 'Sem tratamento adicional.' : 
+                               opt === 'Verde' || opt === 'Verde Premium' ? 'Proteção contra reflexos e luz intensa, ideal para ambientes externos.' :
+                               opt === 'Azul' || opt === 'Azul Premium' ? 'Proteção contra a luz azul nociva de dispositivos digitais, reduzindo a fadiga ocular.' :
+                               'Lentes solares para proteção contra raios UV.'}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="navigation-buttons">
+                    <button class="back-button" onclick="goBack()">Voltar</button>
+                </div>
+            `;
+            navigateTo(stepId);
+        }
+
+        // Seleção de antirreflexo
+        function selectAntirreflexo(opt) {
+            currentSelection.antirreflexo = opt;
+            showSummary();
+        }
+
+        // Mostrar resumo final
+        function showSummary() {
+            const summary = document.getElementById('summary');
+            summary.innerHTML = `
+                <h3>Resumo da Sua Escolha:</h3>
+                <p><strong>Categoria:</strong> ${currentSelection.category.replace('-', ' ').toUpperCase()}</p>
+                <p><strong>Tipo:</strong> ${currentSelection.type}</p>
+                ${currentSelection.versao ? `<p><strong>Versão:</strong> ${currentSelection.versao}</p>` : ''}
+                <p><strong>Fotossensível:</strong> ${currentSelection.fotossensivel}</p>
+                <p><strong>Antirreflexo:</strong> ${currentSelection.antirreflexo}</p>
+                <div class="navigation-buttons">
+                    <button class="back-button" onclick="goBack()">Voltar</button>
+                    <button onclick="init()">Reiniciar</button>
+                </div>
+            `;
+            navigateTo('summary');
+        }
+
+        // Reiniciar o processo
+        function init() {
+            currentSelection = {
+                category: '',
+                type: '',
+                versao: '',
+                fotossensivel: '',
+                antirreflexo: ''
+            };
+            currentStepHistory = ['step1'];
+            navigateTo('step1');
+        }
+
+        // Inicializa o sistema
+        init();
+    </script>
+</body>
+</html>
